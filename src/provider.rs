@@ -85,10 +85,9 @@ pub fn Provider(ChildrenProps { children }: &ChildrenProps) -> Html {
 		}
 	});
 	let on_timeout = use_memo((), |_| {
-		let auth_status = auth_status.clone();
 		let logout = logout.clone();
 		Closure::<dyn Fn()>::new(move || {
-			if *auth_status == Status::Authorizing {
+			if *yewdux::dispatch::get::<Status>() == Status::Authorizing {
 				log::debug!("Authorizing took too long, resetting auth status.");
 				logout.emit(());
 			}
