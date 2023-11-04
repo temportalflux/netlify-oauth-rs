@@ -185,8 +185,8 @@ impl Pending {
 
 	fn handle_event(mut self, evt: MessageEvent) -> EventResponse {
 		let Ok(data_str) = evt.data().into_serde::<String>() else {
-				return EventResponse::Ignored(self);
-			};
+			return EventResponse::Ignored(self);
+		};
 
 		let prefix = match self.handshake_established {
 			false => "authorizing",
