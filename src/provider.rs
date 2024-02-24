@@ -163,8 +163,7 @@ impl Pending {
 		.join(", ");
 		let features = format!("{const_features}, {dyn_features}");
 		log::debug!(target: "auth", "Initializing login");
-		let Ok(Some(auth_window)) =
-			window.open_with_url_and_target_and_features(&auth_url, &window_title, &features)
+		let Ok(Some(auth_window)) = window.open_with_url_and_target_and_features(&auth_url, &window_title, &features)
 		else {
 			return None;
 		};
@@ -208,31 +207,31 @@ impl Pending {
 
 		let _ = self.auth_window.close();
 		let Some(data_state) = data_str.strip_prefix(&format!("{auth_header}:")) else {
-				log::error!(target: "auth", "Invalid data header {auth_header:?}?={data_str:?}");
-				return EventResponse::Ignored(self);
-			};
+			log::error!(target: "auth", "Invalid data header {auth_header:?}?={data_str:?}");
+			return EventResponse::Ignored(self);
+		};
 		let status = if let Some(success_data) = data_state.strip_prefix("success:") {
 			let Ok(data) = serde_json::from_str::<serde_json::Value>(success_data) else {
-					log::error!(target: "auth", "Failed to deserialize success from {success_data:?}");
-					return EventResponse::Ignored(self);
-				};
+				log::error!(target: "auth", "Failed to deserialize success from {success_data:?}");
+				return EventResponse::Ignored(self);
+			};
 			let Some(auth_token) = data.get("token") else {
-					log::error!(target: "auth", "Failed to deserialize auth token from {data:?}");
-					return EventResponse::Ignored(self);
-				};
+				log::error!(target: "auth", "Failed to deserialize auth token from {data:?}");
+				return EventResponse::Ignored(self);
+			};
 			let Some(token) = auth_token.as_str() else {
-					log::error!(target: "auth", "Failed to parse auth token from {auth_token:?}");
-					return EventResponse::Ignored(self);
-				};
+				log::error!(target: "auth", "Failed to parse auth token from {auth_token:?}");
+				return EventResponse::Ignored(self);
+			};
 			Status::Successful {
 				oauth_id: self.provider_id.to_owned(),
 				token: token.to_owned(),
 			}
 		} else if let Some(error_data) = data_state.strip_prefix("error:") {
 			let Ok(data) = serde_json::from_str::<serde_json::Value>(error_data) else {
-					log::error!(target: "auth", "Failed to deserialize error from {error_data:?}");
-					return EventResponse::Ignored(self);
-				};
+				log::error!(target: "auth", "Failed to deserialize error from {error_data:?}");
+				return EventResponse::Ignored(self);
+			};
 			log::error!(target: "auth", "Failed authentication: {data:?}");
 			Status::Failed { error: "".into() }
 		} else {
