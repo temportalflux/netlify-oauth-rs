@@ -87,7 +87,7 @@ pub fn Provider(ChildrenProps { children }: &ChildrenProps) -> Html {
 	let on_timeout = use_memo((), |_| {
 		let logout = logout.clone();
 		Closure::<dyn Fn()>::new(move || {
-			#[cfg(target_family="wasm")]
+			#[cfg(target_family = "wasm")]
 			if *Dispatch::<Status>::global().get() == Status::Authorizing {
 				log::debug!("Authorizing took too long, resetting auth status.");
 				logout.emit(());
