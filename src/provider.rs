@@ -85,6 +85,7 @@ pub fn Provider(ChildrenProps { children }: &ChildrenProps) -> Html {
 		}
 	});
 	let on_timeout = use_memo((), |_| {
+		#[cfg(target_family = "wasm")]
 		let logout = logout.clone();
 		Closure::<dyn Fn()>::new(move || {
 			#[cfg(target_family = "wasm")]
